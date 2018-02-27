@@ -71,8 +71,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	int i;
-	for (i = 2; i > 0; i--) {
+	while (1) {
 		if (ioctl(vcpufd, KVM_RUN, 0) < 0) {
 			perror("error running vCPU: ");
 			return -1;
@@ -89,6 +88,12 @@ int main(int argc, char **argv)
 		case KVM_EXIT_HLT:
 			printf("halt\n");
 			return 0;
+		case KVM_EXIT_FAIL_ENTRY:
+			errx(1,
+			     "KVM_EXIT_FAIL_ENTRY: hardware_entry_failure_reason = 0x%llx",
+			     (unsigned long long)vcpu->
+			     fail_entry.hardware_entry_failure_reason);
+			printf("fail_entry\n");
 		default:
 			printf("exit_reason: 0x%x\n", vcpu->exit_reason);
 		}
